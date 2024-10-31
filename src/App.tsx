@@ -1,4 +1,4 @@
-import { usePaginatedQuery, useQuery } from "convex/react";
+import { useMutation, usePaginatedQuery, useQuery } from "convex/react";
 import { useState } from "react";
 import { api } from "../convex/_generated/api";
 import { Id } from "../convex/_generated/dataModel";
@@ -14,6 +14,8 @@ function App() {
   const [status, setStatus] = useState<
     "waiting" | "approved" | "rejected" | undefined
   >(undefined);
+
+  const seedData = useMutation(api.mutations.seedData);
 
   const channels = useQuery(api.queries.getAllChannels);
 
@@ -33,6 +35,14 @@ function App() {
     },
     { initialNumItems: 2 }
   );
+
+  if (channels?.length === 0) {
+    return (
+      <div>
+        <button onClick={() => seedData()}>Seed Data</button>
+      </div>
+    );
+  }
 
   return (
     <div className="App">
