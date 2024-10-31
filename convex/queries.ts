@@ -10,7 +10,7 @@ export const testQuery = query({
     status: v.optional(statusValidator),
     order: v.optional(v.union(v.literal("asc"), v.literal("desc"))),
   },
-  handler: async (ctx, { channelId, status }) => {
+  handler: async (ctx, { channelId, status, order }) => {
     const q = buildQuery(ctx, {
       table: "video",
       index: channelId
@@ -19,7 +19,8 @@ export const testQuery = query({
             indexRange: (q) => q.eq("channelId", channelId),
           }
         : undefined,
-      filter: status ? (q) => q.eq("status", status) : undefined,
+      order,
+      filter: status ? (q) => q.eq(q.field("status"), status) : undefined,
     });
 
     return q.collect();
@@ -37,7 +38,7 @@ export const testPaginatedQuery = query({
     const paginationResult = await buildPaginatedQuery(ctx, {
       table: "video",
       order: order,
-      filter: status ? (q) => q.eq("status", status) : undefined,
+      filter: status ? (q) => q.eq(q.field("status"), status) : undefined,
       index: channelId
         ? {
             name: "by_channelId",
@@ -48,5 +49,12 @@ export const testPaginatedQuery = query({
     });
 
     return paginationResult;
+  },
+});
+
+export const getAllChannels = query({
+  handler: async (ctx) => {
+    const channels = await ctx.db.query("channel").collect();
+    return channels;
   },
 });

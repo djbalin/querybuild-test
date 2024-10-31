@@ -1,11 +1,13 @@
 import { defineSchema, defineTable } from "convex/server";
-import { v } from "convex/values";
+import { Infer, v } from "convex/values";
 
 export const statusValidator = v.union(
   v.literal("waiting"),
   v.literal("approved"),
   v.literal("rejected")
 );
+
+export type Status = Infer<typeof statusValidator>;
 
 export default defineSchema({
   video: defineTable({
